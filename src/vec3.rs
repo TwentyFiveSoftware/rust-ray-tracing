@@ -55,11 +55,15 @@ impl Div<f64> for Vector3 {
 }
 
 impl Vector3 {
-    pub fn length_squared(&self) -> f64 {
-        self.x * self.x + self.y + self.y + self.z * self.z
+    pub fn length_squared(self) -> f64 {
+        self.x * self.x + self.y * self.y + self.z * self.z
     }
 
-    pub fn length(&self) -> f64 {
+    pub fn length(self) -> f64 {
         self.length_squared().sqrt()
+    }
+
+    pub fn normalized(self) -> Vector3 {
+        self / self.length()
     }
 }
