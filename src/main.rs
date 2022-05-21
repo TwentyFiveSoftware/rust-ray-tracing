@@ -1,8 +1,10 @@
 mod vec3;
 mod ray;
+mod sphere;
 
 use image::{ImageBuffer, Rgb, RgbImage};
 use crate::ray::Ray;
+use crate::sphere::Sphere;
 use crate::vec3::{Vector3};
 
 fn main() {
@@ -43,6 +45,11 @@ fn color_to_rgb(color: Vector3) -> Rgb<u8> {
 }
 
 fn ray_color(ray: Ray) -> Vector3 {
+    let sphere: Sphere = Sphere { center: Vector3 { x: 0.0, y: 0.0, z: 1.0 }, radius: 0.5 };
+    if sphere.ray_hits_sphere(&ray) {
+        return Vector3 { x: 1.0, y: 0.0, z: 0.0 };
+    }
+
     let unit_direction: Vector3 = ray.direction.normalized();
     let t: f64 = 0.5 * (unit_direction.y + 1.0);
     let color: Vector3 = Vector3 { x: 1.0, y: 1.0, z: 1.0 } * (1.0 - t) + Vector3 { x: 0.5, y: 0.7, z: 1.0 } * t;

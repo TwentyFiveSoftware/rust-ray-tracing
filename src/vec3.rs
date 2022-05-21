@@ -55,6 +55,10 @@ impl Div<f64> for Vector3 {
 }
 
 impl Vector3 {
+    pub fn dot(self, other: Vector3) -> f64 {
+        self.x * other.x + self.y * other.y + self.z * other.z
+    }
+
     pub fn length_squared(self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
