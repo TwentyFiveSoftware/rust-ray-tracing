@@ -70,4 +70,8 @@ impl Vector3 {
     pub fn normalized(self) -> Vector3 {
         self / self.length()
     }
+
+    pub const fn zero() -> Vector3 {
+        return Vector3 { x: 0.0, y: 0.0, z: 0.0 };
+    }
 }

@@ -1,8 +1,10 @@
 mod vec3;
 mod ray;
 mod sphere;
+mod hit_record;
 
 use image::{ImageBuffer, Rgb, RgbImage};
+use crate::hit_record::HitRecord;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::vec3::{Vector3};
@@ -16,7 +18,7 @@ fn main() {
     const VIEWPORT_HEIGHT: f64 = 2.0;
     const VIEWPORT_WIDTH: f64 = ASPECT_RATIO * VIEWPORT_HEIGHT;
 
-    const ORIGIN: Vector3 = Vector3 { x: 0.0, y: 0.0, z: 0.0 };
+    const ORIGIN: Vector3 = Vector3::zero();
     const UPPER_LEFT_CORNER_OFFSET: Vector3 =
         Vector3 { x: -0.5 * VIEWPORT_WIDTH, y: 0.5 * VIEWPORT_HEIGHT, z: FOCAL_LENGTH };
 
@@ -46,8 +48,10 @@ fn color_to_rgb(color: Vector3) -> Rgb<u8> {
 
 fn ray_color(ray: Ray) -> Vector3 {
     let sphere: Sphere = Sphere { center: Vector3 { x: 0.0, y: 0.0, z: 1.0 }, radius: 0.5 };
-    if sphere.ray_hits_sphere(&ray) {
-        return Vector3 { x: 1.0, y: 0.0, z: 0.0 };
+
+    let hit_record: HitRecord = sphere.ray_hits_sphere(&ray, 0.0, f64::INFINITY);
+    if hit_record.hit {
+        return (hit_record.normal + Vector3{x: 1.0, y: 1.0, z: 1.0}) * 0.5;
     }
 
     let unit_direction: Vector3 = ray.direction.normalized();
