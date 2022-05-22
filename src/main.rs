@@ -6,6 +6,7 @@ mod scene;
 mod camera;
 
 use image::{ImageBuffer, Rgb, RgbImage};
+use rand::Rng;
 use crate::camera::Camera;
 use crate::hit_record::HitRecord;
 use crate::ray::Ray;
@@ -15,6 +16,7 @@ use crate::vec3::{Vector3};
 
 const IMAGE_WIDTH: u32 = 500;
 const IMAGE_HEIGHT: u32 = 300;
+const SAMPLES_PER_PIXEL: u32 = 100;
 
 fn main() {
     let camera: Camera = Camera::new();
@@ -22,23 +24,39 @@ fn main() {
 
     let mut image: RgbImage = ImageBuffer::new(IMAGE_WIDTH, IMAGE_HEIGHT);
 
+    let mut random = rand::thread_rng();
+
     for y in 0..IMAGE_HEIGHT {
+        println!("{} / {} ({:.2}%)", y + 1, IMAGE_HEIGHT, ((y + 1) as f64) * 100.0 / IMAGE_HEIGHT as f64);
+
         for x in 0..IMAGE_WIDTH {
-            let u: f64 = (x as f64) / (IMAGE_WIDTH as f64);
-            let v: f64 = (y as f64) / (IMAGE_HEIGHT as f64);
+            let mut pixel_color: Vector3 = Vector3::zero();
 
-            let ray: Ray = camera.get_ray(u, v);
-            let color: Vector3 = ray_color(&ray, &scene);
+            for _ in 0..SAMPLES_PER_PIXEL {
+                let u: f64 = (x as f64 + random.gen::<f64>()) / (IMAGE_WIDTH as f64 - 1.0);
+                let v: f64 = (y as f64 + random.gen::<f64>()) / (IMAGE_HEIGHT as f64 - 1.0);
 
-            image.put_pixel(x, y, color_to_rgb(color));
+                let ray: Ray = camera.get_ray(u, v);
+                pixel_color = pixel_color + ray_color(&ray, &scene);
+            }
+
+            image.put_pixel(x, y, color_to_rgb(pixel_color));
         }
     }
 
     image.save("target/image.png").unwrap();
 }
 
-fn color_to_rgb(color: Vector3) -> Rgb<u8> {
-    Rgb([(color.x * 256.0) as u8, (color.y * 256.0) as u8, (color.z * 256.0) as u8])
+fn color_to_rgb(mut color: Vector3) -> Rgb<u8> {
+    color = color / SAMPLES_PER_PIXEL as f64;
+
+    color.x = if color.x > 1.0 { 1.0 } else if color.x < 0.0 { 0.0 } else { color.x };
+    color.y = if color.y > 1.0 { 1.0 } else if color.y < 0.0 { 0.0 } else { color.y };
+    color.z = if color.z > 1.0 { 1.0 } else if color.z < 0.0 { 0.0 } else { color.z };
+
+    color = color * 256.0;
+
+    Rgb([color.x as u8, color.y as u8, color.z as u8])
 }
 
 fn ray_color(ray: &Ray, scene: &Scene) -> Vector3 {
