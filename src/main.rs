@@ -17,6 +17,7 @@ use crate::vec3::{Vector3};
 const IMAGE_WIDTH: u32 = 500;
 const IMAGE_HEIGHT: u32 = 300;
 const SAMPLES_PER_PIXEL: u32 = 100;
+const MAX_RAY_TRACE_DEPTH: u32 = 50;
 
 fn main() {
     let camera: Camera = Camera::new();
@@ -37,7 +38,7 @@ fn main() {
                 let v: f64 = (y as f64 + random.gen::<f64>()) / (IMAGE_HEIGHT as f64 - 1.0);
 
                 let ray: Ray = camera.get_ray(u, v);
-                pixel_color = pixel_color + ray_color(&ray, &scene);
+                pixel_color = pixel_color + ray_color(&scene, &ray, MAX_RAY_TRACE_DEPTH);
             }
 
             image.put_pixel(x, y, color_to_rgb(pixel_color));
@@ -50,6 +51,10 @@ fn main() {
 fn color_to_rgb(mut color: Vector3) -> Rgb<u8> {
     color = color / SAMPLES_PER_PIXEL as f64;
 
+    color.x = color.x.sqrt();
+    color.y = color.y.sqrt();
+    color.z = color.z.sqrt();
+
     color.x = if color.x > 1.0 { 1.0 } else if color.x < 0.0 { 0.0 } else { color.x };
     color.y = if color.y > 1.0 { 1.0 } else if color.y < 0.0 { 0.0 } else { color.y };
     color.z = if color.z > 1.0 { 1.0 } else if color.z < 0.0 { 0.0 } else { color.z };
@@ -59,10 +64,16 @@ fn color_to_rgb(mut color: Vector3) -> Rgb<u8> {
     Rgb([color.x as u8, color.y as u8, color.z as u8])
 }
 
-fn ray_color(ray: &Ray, scene: &Scene) -> Vector3 {
-    let hit_record: HitRecord = ray_hit_scene(scene, &ray, 0.0, f64::INFINITY);
+fn ray_color(scene: &Scene, ray: &Ray, depth: u32) -> Vector3 {
+    if depth <= 0 {
+        return Vector3::zero();
+    }
+
+    let hit_record: HitRecord = ray_hit_scene(scene, &ray, 0.001, f64::INFINITY);
     if hit_record.hit {
-        return (hit_record.normal + Vector3 { x: 1.0, y: 1.0, z: 1.0 }) * 0.5;
+        let diffuse_ray_direction: Vector3 = hit_record.normal + Vector3::random_unit_vector();
+        let diffuse_ray: Ray = Ray { origin: hit_record.point, direction: diffuse_ray_direction };
+        return ray_color(scene, &diffuse_ray, depth - 1) * 0.5;
     }
 
     let unit_direction: Vector3 = ray.direction.normalized();

@@ -1,5 +1,6 @@
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, Div, Mul, Neg, Sub};
+use rand::Rng;
 
 #[derive(Copy, Clone)]
 pub struct Vector3 {
@@ -73,5 +74,21 @@ impl Vector3 {
 
     pub const fn zero() -> Vector3 {
         return Vector3 { x: 0.0, y: 0.0, z: 0.0 };
+    }
+
+    pub fn random_unit_vector() -> Vector3 {
+        let mut random = rand::thread_rng();
+
+        loop {
+            let vector: Vector3 = Vector3 {
+                x: random.gen::<f64>() * 2.0 - 1.0,
+                y: random.gen::<f64>() * 2.0 - 1.0,
+                z: random.gen::<f64>() * 2.0 - 1.0,
+            };
+
+            if vector.length_squared() < 1.0 {
+                return vector.normalized();
+            }
+        }
     }
 }
