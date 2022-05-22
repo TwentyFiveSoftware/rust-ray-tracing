@@ -28,8 +28,16 @@ impl Sphere {
             }
         }
 
-        let point = ray.at(t);
-        let normal = (point - self.center) / self.radius;
-        return HitRecord { hit: true, normal, t, point };
+        let point: Vector3 = ray.at(t);
+        let normal: Vector3 = (point - self.center) / self.radius;
+        let is_front_face: bool = ray.direction.dot(normal) < 0.0;
+
+        return HitRecord {
+            hit: true,
+            t,
+            point,
+            normal: if is_front_face { normal } else { -normal },
+            is_front_face,
+        };
     }
 }
