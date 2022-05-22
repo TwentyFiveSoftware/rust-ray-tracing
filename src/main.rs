@@ -3,40 +3,31 @@ mod ray;
 mod sphere;
 mod hit_record;
 mod scene;
+mod camera;
 
 use image::{ImageBuffer, Rgb, RgbImage};
+use crate::camera::Camera;
 use crate::hit_record::HitRecord;
 use crate::ray::Ray;
 use crate::scene::Scene;
 use crate::sphere::Sphere;
 use crate::vec3::{Vector3};
 
+const IMAGE_WIDTH: u32 = 500;
+const IMAGE_HEIGHT: u32 = 300;
+
 fn main() {
-    const WIDTH: u32 = 500;
-    const HEIGHT: u32 = 300;
-
-    const ASPECT_RATIO: f64 = (WIDTH as f64) / (HEIGHT as f64);
-    const FOCAL_LENGTH: f64 = 1.0;
-    const VIEWPORT_HEIGHT: f64 = 2.0;
-    const VIEWPORT_WIDTH: f64 = ASPECT_RATIO * VIEWPORT_HEIGHT;
-
-    const ORIGIN: Vector3 = Vector3::zero();
-    const UPPER_LEFT_CORNER_OFFSET: Vector3 =
-        Vector3 { x: -0.5 * VIEWPORT_WIDTH, y: 0.5 * VIEWPORT_HEIGHT, z: FOCAL_LENGTH };
-
+    let camera: Camera = Camera::new();
     let scene: Scene = generate_scene();
 
-    let mut image: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
+    let mut image: RgbImage = ImageBuffer::new(IMAGE_WIDTH, IMAGE_HEIGHT);
 
-    for y in 0..HEIGHT {
-        for x in 0..WIDTH {
-            let u: f64 = (x as f64) / (WIDTH as f64);
-            let v: f64 = (y as f64) / (HEIGHT as f64);
+    for y in 0..IMAGE_HEIGHT {
+        for x in 0..IMAGE_WIDTH {
+            let u: f64 = (x as f64) / (IMAGE_WIDTH as f64);
+            let v: f64 = (y as f64) / (IMAGE_HEIGHT as f64);
 
-            let direction: Vector3 = UPPER_LEFT_CORNER_OFFSET
-                + Vector3 { x: u * VIEWPORT_WIDTH, y: -v * VIEWPORT_HEIGHT, z: 0.0 };
-            let ray: Ray = Ray { origin: ORIGIN, direction };
-
+            let ray: Ray = camera.get_ray(u, v);
             let color: Vector3 = ray_color(&ray, &scene);
 
             image.put_pixel(x, y, color_to_rgb(color));
