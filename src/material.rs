@@ -5,7 +5,7 @@ use crate::scatter_info::ScatterInfo;
 pub enum Material {
     NONE,
     DIFFUSE(Vector3),
-    METAL(Vector3),
+    METAL(Vector3, f64),
 }
 
 
@@ -14,7 +14,7 @@ impl Material {
         return match self {
             Material::NONE => ScatterInfo::no_scatter(),
             Material::DIFFUSE(albedo) => Material::scatter_diffuse(hit_record, albedo),
-            Material::METAL(albedo) => Material::scatter_metal(ray, hit_record, albedo),
+            Material::METAL(albedo, fuzz) => Material::scatter_metal(ray, hit_record, albedo, fuzz),
         };
     }
 
@@ -35,13 +35,16 @@ impl Material {
         }
     }
 
-    fn scatter_metal(ray: &Ray, hit_record: &HitRecord, albedo: Vector3) -> ScatterInfo {
+    fn scatter_metal(ray: &Ray, hit_record: &HitRecord, albedo: Vector3, fuzz: f64) -> ScatterInfo {
+        let scatter_direction: Vector3 = Material::reflect(ray.direction.normalized(), hit_record.normal)
+            + Vector3::random_unit_vector() * fuzz;
+
         ScatterInfo {
-            does_scatter: true,
+            does_scatter: scatter_direction.dot(hit_record.normal) > 0.0,
             attenuation: albedo,
             scattered_ray: Ray {
                 origin: hit_record.point,
-                direction: Material::reflect(ray.direction.normalized(), hit_record.normal),
+                direction: scatter_direction,
             },
         }
     }
