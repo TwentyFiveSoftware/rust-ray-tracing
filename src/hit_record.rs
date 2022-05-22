@@ -1,4 +1,4 @@
-use crate::Vector3;
+use crate::{Material, Vector3};
 
 pub struct HitRecord {
     pub hit: bool,
@@ -6,6 +6,7 @@ pub struct HitRecord {
     pub point: Vector3,
     pub normal: Vector3,
     pub is_front_face: bool,
+    pub material: Material,
 }
 
 impl HitRecord {
@@ -16,6 +17,7 @@ impl HitRecord {
             point: Vector3::zero(),
             normal: Vector3::zero(),
             is_front_face: true,
+            material: Material::NONE,
         }
     }
 }

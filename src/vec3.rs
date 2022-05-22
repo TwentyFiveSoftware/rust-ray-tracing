@@ -47,6 +47,14 @@ impl Mul<f64> for Vector3 {
     }
 }
 
+impl Mul<Vector3> for Vector3 {
+    type Output = Vector3;
+
+    fn mul(self, other: Vector3) -> Self::Output {
+        Vector3 { x: self.x * other.x, y: self.y * other.y, z: self.z * other.z }
+    }
+}
+
 impl Div<f64> for Vector3 {
     type Output = Vector3;
 
@@ -70,6 +78,11 @@ impl Vector3 {
 
     pub fn normalized(self) -> Vector3 {
         self / self.length()
+    }
+
+    pub fn is_near_zero(self) -> bool {
+        const EPSILON: f64 = 1e-8;
+        self.x.abs() < EPSILON && self.y.abs() < EPSILON && self.z.abs() < EPSILON
     }
 
     pub const fn zero() -> Vector3 {

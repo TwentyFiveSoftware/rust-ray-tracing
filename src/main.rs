@@ -4,12 +4,16 @@ mod sphere;
 mod hit_record;
 mod scene;
 mod camera;
+mod material;
+mod scatter_info;
 
 use image::{ImageBuffer, Rgb, RgbImage};
 use rand::Rng;
 use crate::camera::Camera;
 use crate::hit_record::HitRecord;
+use crate::material::Material;
 use crate::ray::Ray;
+use crate::scatter_info::ScatterInfo;
 use crate::scene::Scene;
 use crate::sphere::Sphere;
 use crate::vec3::{Vector3};
@@ -71,9 +75,13 @@ fn ray_color(scene: &Scene, ray: &Ray, depth: u32) -> Vector3 {
 
     let hit_record: HitRecord = ray_hit_scene(scene, &ray, 0.001, f64::INFINITY);
     if hit_record.hit {
-        let diffuse_ray_direction: Vector3 = hit_record.normal + Vector3::random_unit_vector();
-        let diffuse_ray: Ray = Ray { origin: hit_record.point, direction: diffuse_ray_direction };
-        return ray_color(scene, &diffuse_ray, depth - 1) * 0.5;
+        let scatter_info: ScatterInfo = hit_record.material.scatter(ray, &hit_record);
+
+        if scatter_info.does_scatter {
+            return scatter_info.attenuation * ray_color(scene, &scatter_info.scattered_ray, depth - 1);
+        }
+
+        return Vector3::zero();
     }
 
     let unit_direction: Vector3 = ray.direction.normalized();
@@ -99,8 +107,33 @@ fn ray_hit_scene(scene: &Scene, ray: &Ray, t_min: f64, t_max: f64) -> HitRecord 
 fn generate_scene() -> Scene {
     let mut spheres: Vec<Sphere> = Vec::new();
 
-    spheres.push(Sphere { center: Vector3 { x: 0.0, y: 0.0, z: 1.0 }, radius: 0.5 });
-    spheres.push(Sphere { center: Vector3 { x: 0.0, y: -100.5, z: 1.0 }, radius: 100.0 });
+    // ground
+    spheres.push(Sphere {
+        center: Vector3 { x: 0.0, y: -100.5, z: 1.0 },
+        radius: 100.0,
+        material: Material::DIFFUSE(Vector3 { x: 0.8, y: 0.8, z: 0.0 }),
+    });
+
+    // center
+    spheres.push(Sphere {
+        center: Vector3 { x: 0.0, y: 0.0, z: 1.0 },
+        radius: 0.5,
+        material: Material::DIFFUSE(Vector3 { x: 0.7, y: 0.3, z: 0.3 }),
+    });
+
+    // left
+    spheres.push(Sphere {
+        center: Vector3 { x: -1.0, y: 0.0, z: 1.0 },
+        radius: 0.5,
+        material: Material::METAL(Vector3 { x: 0.8, y: 0.8, z: 0.8 }),
+    });
+
+    // right
+    spheres.push(Sphere {
+        center: Vector3 { x: 1.0, y: 0.0, z: 1.0 },
+        radius: 0.5,
+        material: Material::METAL(Vector3 { x: 0.8, y: 0.6, z: 0.2 }),
+    });
 
     Scene { spheres }
 }

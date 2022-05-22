@@ -1,9 +1,11 @@
 use crate::{Ray, Vector3};
 use crate::hit_record::HitRecord;
+use crate::material::Material;
 
 pub struct Sphere {
     pub center: Vector3,
     pub radius: f64,
+    pub material: Material,
 }
 
 impl Sphere {
@@ -38,6 +40,7 @@ impl Sphere {
             point,
             normal: if is_front_face { normal } else { -normal },
             is_front_face,
+            material: self.material,
         };
     }
 }
