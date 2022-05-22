@@ -118,21 +118,21 @@ fn generate_scene() -> Scene {
     spheres.push(Sphere {
         center: Vector3 { x: 0.0, y: 0.0, z: 1.0 },
         radius: 0.5,
-        material: Material::DIFFUSE(Vector3 { x: 0.7, y: 0.3, z: 0.3 }),
+        material: Material::DIFFUSE(Vector3 { x: 0.1, y: 0.2, z: 0.5 }),
     });
 
     // left
     spheres.push(Sphere {
         center: Vector3 { x: -1.0, y: 0.0, z: 1.0 },
         radius: 0.5,
-        material: Material::METAL(Vector3 { x: 0.8, y: 0.8, z: 0.8 }, 0.3),
+        material: Material::DIELECTRIC(1.5),
     });
 
     // right
     spheres.push(Sphere {
         center: Vector3 { x: 1.0, y: 0.0, z: 1.0 },
         radius: 0.5,
-        material: Material::METAL(Vector3 { x: 0.8, y: 0.6, z: 0.2 }, 1.0),
+        material: Material::METAL(Vector3 { x: 0.8, y: 0.6, z: 0.2 }, 0.0),
     });
 
     Scene { spheres }
