@@ -14,25 +14,25 @@ use crate::hit_record::HitRecord;
 use crate::material::Material;
 use crate::ray::Ray;
 use crate::scatter_info::ScatterInfo;
-use crate::scene::Scene;
+use crate::scene::{Scene};
 use crate::sphere::Sphere;
 use crate::vec3::{Vector3};
 
-const IMAGE_WIDTH: u32 = 500;
-const IMAGE_HEIGHT: u32 = 300;
-const SAMPLES_PER_PIXEL: u32 = 100;
+const IMAGE_WIDTH: u32 = 1920;
+const IMAGE_HEIGHT: u32 = 1080;
+const SAMPLES_PER_PIXEL: u32 = 128;
 const MAX_RAY_TRACE_DEPTH: u32 = 50;
 
 fn main() {
     let camera: Camera = Camera::new(
-        Vector3 { x: 3.0, y: 3.0, z: -2.0 },
-        Vector3 { x: 0.0, y: 0.0, z: 1.0 },
-        20.0,
-        2.0,
-        5.2,
+        Vector3 { x: 12.0, y: 2.0, z: -3.0 },
+        Vector3 { x: 0.0, y: 0.0, z: 0.0 },
+        25.0,
+        0.0,
+        10.0,
     );
 
-    let scene: Scene = generate_scene();
+    let scene: Scene = Scene::generate();
 
     let mut image: RgbImage = ImageBuffer::new(IMAGE_WIDTH, IMAGE_HEIGHT);
 
@@ -109,38 +109,4 @@ fn ray_hit_scene(scene: &Scene, ray: &Ray, t_min: f64, t_max: f64) -> HitRecord 
     }
 
     current_record
-}
-
-fn generate_scene() -> Scene {
-    let mut spheres: Vec<Sphere> = Vec::new();
-
-    // ground
-    spheres.push(Sphere {
-        center: Vector3 { x: 0.0, y: -100.5, z: 1.0 },
-        radius: 100.0,
-        material: Material::DIFFUSE(Vector3 { x: 0.8, y: 0.8, z: 0.0 }),
-    });
-
-    // center
-    spheres.push(Sphere {
-        center: Vector3 { x: 0.0, y: 0.0, z: 1.0 },
-        radius: 0.5,
-        material: Material::DIFFUSE(Vector3 { x: 0.1, y: 0.2, z: 0.5 }),
-    });
-
-    // left
-    spheres.push(Sphere {
-        center: Vector3 { x: -1.0, y: 0.0, z: 1.0 },
-        radius: 0.5,
-        material: Material::DIELECTRIC(1.5),
-    });
-
-    // right
-    spheres.push(Sphere {
-        center: Vector3 { x: 1.0, y: 0.0, z: 1.0 },
-        radius: 0.5,
-        material: Material::METAL(Vector3 { x: 0.8, y: 0.6, z: 0.2 }, 0.0),
-    });
-
-    Scene { spheres }
 }
