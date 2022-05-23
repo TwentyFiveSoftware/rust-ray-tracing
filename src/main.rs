@@ -25,9 +25,11 @@ const MAX_RAY_TRACE_DEPTH: u32 = 50;
 
 fn main() {
     let camera: Camera = Camera::new(
-        Vector3 { x: -2.0, y: 2.0, z: -1.0 },
+        Vector3 { x: 3.0, y: 3.0, z: -2.0 },
         Vector3 { x: 0.0, y: 0.0, z: 1.0 },
         20.0,
+        2.0,
+        5.2,
     );
 
     let scene: Scene = generate_scene();

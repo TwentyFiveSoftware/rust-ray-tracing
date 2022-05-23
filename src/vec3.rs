@@ -97,6 +97,10 @@ impl Vector3 {
         return Vector3 { x: 0.0, y: 0.0, z: 0.0 };
     }
 
+    pub const fn up() -> Vector3 {
+        return Vector3 { x: 0.0, y: 1.0, z: 0.0 };
+    }
+
     pub fn random_unit_vector() -> Vector3 {
         let mut random = rand::thread_rng();
 
