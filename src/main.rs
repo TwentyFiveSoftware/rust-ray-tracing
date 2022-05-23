@@ -24,7 +24,12 @@ const SAMPLES_PER_PIXEL: u32 = 100;
 const MAX_RAY_TRACE_DEPTH: u32 = 50;
 
 fn main() {
-    let camera: Camera = Camera::new();
+    let camera: Camera = Camera::new(
+        Vector3 { x: -2.0, y: 2.0, z: -1.0 },
+        Vector3 { x: 0.0, y: 0.0, z: 1.0 },
+        20.0,
+    );
+
     let scene: Scene = generate_scene();
 
     let mut image: RgbImage = ImageBuffer::new(IMAGE_WIDTH, IMAGE_HEIGHT);
