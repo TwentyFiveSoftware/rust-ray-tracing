@@ -7,6 +7,8 @@ mod camera;
 mod material;
 mod scatter_info;
 
+use std::sync::{Arc, mpsc, Mutex};
+use std::thread;
 use image::{ImageBuffer, Rgb, RgbImage};
 use rand::Rng;
 use crate::camera::Camera;
@@ -22,37 +24,82 @@ const IMAGE_WIDTH: u32 = 1920;
 const IMAGE_HEIGHT: u32 = 1080;
 const SAMPLES_PER_PIXEL: u32 = 128;
 const MAX_RAY_TRACE_DEPTH: u32 = 50;
+const RENDER_THREADS: u32 = 22;
 
 fn main() {
-    let camera: Camera = Camera::new(
+    let camera = Arc::new(Camera::new(
         Vector3 { x: 12.0, y: 2.0, z: -3.0 },
         Vector3 { x: 0.0, y: 0.0, z: 0.0 },
         25.0,
         0.0,
         10.0,
-    );
+    ));
 
-    let scene: Scene = Scene::generate();
+    let scene = Arc::new(Scene::generate());
 
     let mut image: RgbImage = ImageBuffer::new(IMAGE_WIDTH, IMAGE_HEIGHT);
 
-    let mut random = rand::thread_rng();
+    let next_row = Arc::new(Mutex::new(0));
+    let (rows_sender, rows_receiver) = mpsc::channel();
+    let mut handles = Vec::new();
 
-    for y in 0..IMAGE_HEIGHT {
-        println!("{} / {} ({:.2}%)", y + 1, IMAGE_HEIGHT, ((y + 1) as f64) * 100.0 / IMAGE_HEIGHT as f64);
+    for _ in 0..RENDER_THREADS {
+        let thread_rows_sender = rows_sender.clone();
+        let thread_next_row = Arc::clone(&next_row);
+        let thread_scene = Arc::clone(&scene);
+        let thread_camera = Arc::clone(&camera);
 
-        for x in 0..IMAGE_WIDTH {
-            let mut pixel_color: Vector3 = Vector3::zero();
+        let handle = thread::spawn(move || {
+            loop {
+                let mut next_row = thread_next_row.lock().unwrap();
+                if *next_row >= IMAGE_HEIGHT {
+                    break;
+                }
 
-            for _ in 0..SAMPLES_PER_PIXEL {
-                let u: f64 = (x as f64 + random.gen::<f64>()) / (IMAGE_WIDTH as f64 - 1.0);
-                let v: f64 = (y as f64 + random.gen::<f64>()) / (IMAGE_HEIGHT as f64 - 1.0);
+                let y = *next_row;
+                *next_row += 1;
+                drop(next_row);
 
-                let ray: Ray = camera.get_ray(u, v);
-                pixel_color = pixel_color + ray_color(&scene, &ray, MAX_RAY_TRACE_DEPTH);
+                println!("{} / {} ({:.2}%)", y + 1, IMAGE_HEIGHT, ((y + 1) as f64) * 100.0 / IMAGE_HEIGHT as f64);
+
+                let mut row: [Rgb<u8>; IMAGE_WIDTH as usize] = [Rgb([0, 0, 0]); IMAGE_WIDTH as usize];
+                let mut random = rand::thread_rng();
+
+                for x in 0..IMAGE_WIDTH {
+                    let mut pixel_color: Vector3 = Vector3::zero();
+
+                    for _ in 0..SAMPLES_PER_PIXEL {
+                        let u: f64 = (x as f64 + random.gen::<f64>()) / (IMAGE_WIDTH as f64 - 1.0);
+                        let v: f64 = (y as f64 + random.gen::<f64>()) / (IMAGE_HEIGHT as f64 - 1.0);
+
+                        let ray: Ray = thread_camera.get_ray(u, v);
+                        pixel_color = pixel_color + ray_color(&thread_scene, &ray, MAX_RAY_TRACE_DEPTH);
+                    }
+
+                    row[x as usize] = color_to_rgb(pixel_color);
+                }
+
+                thread_rows_sender.send((y, row)).unwrap();
             }
+        });
 
-            image.put_pixel(x, y, color_to_rgb(pixel_color));
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    let mut rows_processed: u32 = 0;
+
+    for (y, row) in rows_receiver {
+        for x in 0..row.len() {
+            image.put_pixel(x as u32, y, row[x]);
+        }
+
+        rows_processed += 1;
+        if rows_processed >= IMAGE_HEIGHT {
+            break;
         }
     }
 

@@ -13,7 +13,7 @@ impl Scene {
         spheres.push(Sphere {
             center: Vector3 { x: 0.0, y: -1000.5, z: 1.0 },
             radius: 1000.0,
-            material: Material::DIFFUSE(Vector3 { x: 0.05, y: 0.05, z: 0.05 }),
+            material: Material::DIFFUSE(Vector3 { x: 0.95, y: 0.95, z: 0.95 }),
         });
 
         let mut random = rand::thread_rng();
