@@ -6,6 +6,7 @@ mod scene;
 mod camera;
 mod material;
 mod scatter_info;
+mod texture;
 
 use std::sync::{Arc, mpsc, Mutex};
 use std::thread;

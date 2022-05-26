@@ -1,5 +1,6 @@
 use rand::Rng;
 use crate::{Material, Sphere, Vector3};
+use crate::texture::Texture;
 
 pub struct Scene {
     pub spheres: Vec<Sphere>,
@@ -11,9 +12,10 @@ impl Scene {
 
         // GROUND
         spheres.push(Sphere {
-            center: Vector3 { x: 0.0, y: -1000.5, z: 1.0 },
+            center: Vector3 { x: 0.0, y: -1000.0, z: 1.0 },
             radius: 1000.0,
-            material: Material::DIFFUSE(Vector3 { x: 0.95, y: 0.95, z: 0.95 }),
+            material: Material::DIFFUSE(Texture::CHECKERED(
+                Vector3 { x: 0.05, y: 0.05, z: 0.05 }, Vector3 { x: 0.95, y: 0.95, z: 0.95 })),
         });
 
         let mut random = rand::thread_rng();
@@ -25,9 +27,9 @@ impl Scene {
 
                 let material: Material =
                     if material_random < 0.8 {
-                        Material::DIFFUSE(random_color())
+                        Material::DIFFUSE(Texture::SOLID(random_color()))
                     } else if material_random < 0.95 {
-                        Material::METAL(random_color(), 0.0)
+                        Material::METAL(Texture::SOLID(random_color()), 0.0)
                     } else {
                         Material::DIELECTRIC(1.5)
                     };
@@ -54,13 +56,13 @@ impl Scene {
         spheres.push(Sphere {
             center: Vector3 { x: -4.0, y: 1.0, z: 0.0 },
             radius: 1.0,
-            material: Material::DIFFUSE(Vector3 { x: 0.6, y: 0.3, z: 0.1 }),
+            material: Material::DIFFUSE(Texture::SOLID(Vector3 { x: 0.6, y: 0.3, z: 0.1 })),
         });
 
         spheres.push(Sphere {
             center: Vector3 { x: 4.0, y: 1.0, z: 0.0 },
             radius: 1.0,
-            material: Material::METAL(Vector3 { x: 0.7, y: 0.6, z: 0.5 }, 0.0),
+            material: Material::METAL(Texture::SOLID(Vector3 { x: 0.7, y: 0.6, z: 0.5 }), 0.0),
         });
 
         Scene { spheres }

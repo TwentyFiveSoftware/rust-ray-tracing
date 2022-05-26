@@ -1,27 +1,27 @@
 use rand::Rng;
 use crate::{HitRecord, Ray, Vector3};
 use crate::scatter_info::ScatterInfo;
+use crate::texture::Texture;
 
 #[derive(Copy, Clone)]
 pub enum Material {
     NONE,
-    DIFFUSE(Vector3),
-    METAL(Vector3, f64),
+    DIFFUSE(Texture),
+    METAL(Texture, f64),
     DIELECTRIC(f64),
 }
-
 
 impl Material {
     pub fn scatter(self, ray: &Ray, hit_record: &HitRecord) -> ScatterInfo {
         return match self {
             Material::NONE => ScatterInfo::no_scatter(),
-            Material::DIFFUSE(albedo) => Material::scatter_diffuse(hit_record, albedo),
-            Material::METAL(albedo, fuzz) => Material::scatter_metal(ray, hit_record, albedo, fuzz),
+            Material::DIFFUSE(texture) => Material::scatter_diffuse(hit_record, texture),
+            Material::METAL(texture, fuzz) => Material::scatter_metal(ray, hit_record, texture, fuzz),
             Material::DIELECTRIC(refraction_index) => Material::scatter_dielectric(ray, hit_record, refraction_index)
         };
     }
 
-    fn scatter_diffuse(hit_record: &HitRecord, albedo: Vector3) -> ScatterInfo {
+    fn scatter_diffuse(hit_record: &HitRecord, texture: Texture) -> ScatterInfo {
         let mut scatter_direction: Vector3 = hit_record.normal + Vector3::random_unit_vector();
 
         if scatter_direction.is_near_zero() {
@@ -30,7 +30,7 @@ impl Material {
 
         ScatterInfo {
             does_scatter: true,
-            attenuation: albedo,
+            attenuation: texture.get_color(hit_record.point),
             scattered_ray: Ray {
                 origin: hit_record.point,
                 direction: scatter_direction,
@@ -38,13 +38,13 @@ impl Material {
         }
     }
 
-    fn scatter_metal(ray: &Ray, hit_record: &HitRecord, albedo: Vector3, fuzz: f64) -> ScatterInfo {
+    fn scatter_metal(ray: &Ray, hit_record: &HitRecord, texture: Texture, fuzz: f64) -> ScatterInfo {
         let scatter_direction: Vector3 = Material::reflect(ray.direction.normalized(), hit_record.normal)
             + Vector3::random_unit_vector() * fuzz;
 
         ScatterInfo {
             does_scatter: scatter_direction.dot(hit_record.normal) > 0.0,
-            attenuation: albedo,
+            attenuation: texture.get_color(hit_record.point),
             scattered_ray: Ray {
                 origin: hit_record.point,
                 direction: scatter_direction,
