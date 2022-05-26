@@ -9,10 +9,11 @@ mod scatter_info;
 mod texture;
 
 use std::sync::{Arc, mpsc, Mutex};
-use std::thread;
+use std::{thread};
 use std::time::{Duration, Instant};
 use image::{ImageBuffer, Rgb, RgbImage};
 use rand::Rng;
+use clap::Parser;
 use crate::camera::Camera;
 use crate::hit_record::HitRecord;
 use crate::material::Material;
@@ -24,11 +25,24 @@ use crate::vec3::{Vector3};
 
 const IMAGE_WIDTH: u32 = 1920;
 const IMAGE_HEIGHT: u32 = 1080;
-const SAMPLES_PER_PIXEL: u32 = 128;
 const MAX_RAY_TRACE_DEPTH: u32 = 50;
-const RENDER_THREADS: u32 = 22;
+const DEFAULT_SAMPLES_PER_PIXEL: u32 = 100;
+
+#[derive(Parser, Debug)]
+struct Args {
+    /// Amount of samples per pixel to calculate
+    #[clap(short, long, default_value_t = DEFAULT_SAMPLES_PER_PIXEL)]
+    samples_per_pixel: u32,
+
+    /// Number of render threads
+    #[clap(short, long, default_value_t = num_cpus::get() as u32)]
+    threads: u32,
+}
 
 fn main() {
+    let mut args: Args = Args::parse();
+    args.threads = args.threads.max(1);
+
     let camera = Arc::new(Camera::new(
         Vector3 { x: 12.0, y: 2.0, z: -3.0 },
         Vector3 { x: 0.0, y: 0.0, z: 0.0 },
@@ -47,7 +61,7 @@ fn main() {
 
     let render_start_time = Instant::now();
 
-    for _ in 0..RENDER_THREADS {
+    for _ in 0..args.threads {
         let thread_rows_sender = rows_sender.clone();
         let thread_next_row = Arc::clone(&next_row);
         let thread_scene = Arc::clone(&scene);
@@ -72,7 +86,7 @@ fn main() {
                 for x in 0..IMAGE_WIDTH {
                     let mut pixel_color: Vector3 = Vector3::zero();
 
-                    for _ in 0..SAMPLES_PER_PIXEL {
+                    for _ in 0..args.samples_per_pixel {
                         let u: f64 = (x as f64 + random.gen::<f64>()) / (IMAGE_WIDTH as f64 - 1.0);
                         let v: f64 = (y as f64 + random.gen::<f64>()) / (IMAGE_HEIGHT as f64 - 1.0);
 
@@ -80,7 +94,7 @@ fn main() {
                         pixel_color = pixel_color + ray_color(&thread_scene, &ray, MAX_RAY_TRACE_DEPTH);
                     }
 
-                    row[x as usize] = color_to_rgb(pixel_color);
+                    row[x as usize] = color_to_rgb(pixel_color, args.samples_per_pixel);
                 }
 
                 thread_rows_sender.send((y, row)).unwrap();
@@ -95,8 +109,8 @@ fn main() {
     }
 
     let elapsed_render_time: Duration = render_start_time.elapsed();
-    println!("Rendered {} samples / pixel with {} threads in {}ms",
-             SAMPLES_PER_PIXEL, RENDER_THREADS, elapsed_render_time.as_millis());
+    println!("Rendered {} samples/pixel with {} threads in {} ms",
+             args.samples_per_pixel, args.threads, elapsed_render_time.as_millis());
 
     let mut rows_processed: u32 = 0;
 
@@ -114,8 +128,8 @@ fn main() {
     image.save("render.png").unwrap();
 }
 
-fn color_to_rgb(mut color: Vector3) -> Rgb<u8> {
-    color = color / SAMPLES_PER_PIXEL as f64;
+fn color_to_rgb(mut color: Vector3, samples: u32) -> Rgb<u8> {
+    color = color / (samples as f64);
 
     color.x = color.x.sqrt();
     color.y = color.y.sqrt();
