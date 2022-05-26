@@ -10,6 +10,7 @@ mod texture;
 
 use std::sync::{Arc, mpsc, Mutex};
 use std::thread;
+use std::time::{Duration, Instant};
 use image::{ImageBuffer, Rgb, RgbImage};
 use rand::Rng;
 use crate::camera::Camera;
@@ -43,6 +44,8 @@ fn main() {
     let next_row = Arc::new(Mutex::new(0));
     let (rows_sender, rows_receiver) = mpsc::channel();
     let mut handles = Vec::new();
+
+    let render_start_time = Instant::now();
 
     for _ in 0..RENDER_THREADS {
         let thread_rows_sender = rows_sender.clone();
@@ -91,6 +94,10 @@ fn main() {
         handle.join().unwrap();
     }
 
+    let elapsed_render_time: Duration = render_start_time.elapsed();
+    println!("Rendered {} samples / pixel with {} threads in {}ms",
+             SAMPLES_PER_PIXEL, RENDER_THREADS, elapsed_render_time.as_millis());
+
     let mut rows_processed: u32 = 0;
 
     for (y, row) in rows_receiver {
@@ -104,7 +111,7 @@ fn main() {
         }
     }
 
-    image.save("target/image.png").unwrap();
+    image.save("render.png").unwrap();
 }
 
 fn color_to_rgb(mut color: Vector3) -> Rgb<u8> {
