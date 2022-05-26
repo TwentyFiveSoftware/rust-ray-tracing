@@ -29,9 +29,9 @@ depth, the same resolution (1920 x 1080). The measured times are averaged over m
 
 *Reference system: AMD Ryzen 9 5900X (12 Cores / 24 Threads) | AMD Radeon RX 6800 XT*
 
-|                                                                                                                | 1 sample / pixel | 100 samples / pixel |    10,000 samples / pixel | 
-|----------------------------------------------------------------------------------------------------------------|-----------------:|--------------------:|--------------------------:|
-| [CPU Ray Tracing (C++, with abstractions)](https://github.com/TwentyFiveSoftware/ray-tracing)                  |       3,800.0 ms |             380.0 s | ~ 10.5 h _(extrapolated)_ |
-| [CPU Ray Tracing (Rust)](https://github.com/TwentyFiveSoftware/rust-ray-tracing)                               |         770.0 ms |              77.0 s |  ~ 2.1 h _(extrapolated)_ |
-| [GPU Ray Tracing (Compute Shader)](https://github.com/TwentyFiveSoftware/ray-tracing-gpu)                      |          21.5 ms |               2.1 s |                   215.0 s |
-| [GPU Ray Tracing (Vulkan Ray Tracing extension)](https://github.com/TwentyFiveSoftware/ray-tracing-gpu-vulkan) |           1.2 ms |               0.1 s |                    12.5 s |
+|                                                                                                                     | 1 sample / pixel | 100 samples / pixel |         10,000 samples / pixel | 
+|---------------------------------------------------------------------------------------------------------------------|-----------------:|--------------------:|-------------------------------:|
+| [CPU Ray Tracing <br/>(C++, with abstractions)](https://github.com/TwentyFiveSoftware/ray-tracing)                  |       3,800.0 ms |             380.0 s | ~ 10.5 h <br/>_(extrapolated)_ |
+| [CPU Ray Tracing <br/>(Rust)](https://github.com/TwentyFiveSoftware/rust-ray-tracing)                               |         770.0 ms |              77.0 s |  ~ 2.1 h <br/>_(extrapolated)_ |
+| [GPU Ray Tracing <br/>(Compute Shader)](https://github.com/TwentyFiveSoftware/ray-tracing-gpu)                      |          21.5 ms |               2.1 s |                        215.0 s |
+| [GPU Ray Tracing <br/>(Vulkan Ray Tracing extension)](https://github.com/TwentyFiveSoftware/ray-tracing-gpu-vulkan) |           1.2 ms |               0.1 s |                         12.5 s |
