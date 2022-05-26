@@ -4,16 +4,34 @@
 
 ## Overview
 
-This is my take on [Peter Shirley's Ray Tracing in One Weekend](https://github.com/RayTracing/raytracing.github.io) book
-series.
+This is my take on [Peter Shirley's Ray Tracing in One Weekend](https://github.com/RayTracing/raytracing.github.io) book.
 
 This project uses the [Rust](https://www.rust-lang.org/) programming language to achieve high performance and memory efficiency while providing many benefits such as memory- and thread-safety.
 
-## My Ray Tracing series
+## Build & Run this project
 
-I've already implemented Peter Shirley's ray tracing in different languages and environments and compared their performance.
-If you're interested, you can find these projects here:
+1. Install [Rust](https://www.rust-lang.org/tools/install)
+2. Build the project
+    ```console
+    cargo build --release
+    ```
+3. Run the executable
+   ```console
+   ./target/release/rust-ray-tracing
+   ```
 
-- [CPU Ray Tracing (C++)](https://github.com/TwentyFiveSoftware/ray-tracing)
-- [GPU Ray Tracing (Compute Shader)](https://github.com/TwentyFiveSoftware/ray-tracing-gpu)
-- [GPU Ray Tracing (Vulkan Ray Tracing extension)](https://github.com/TwentyFiveSoftware/ray-tracing-gpu-vulkan)
+## Performance
+
+I've already implemented Peter Shirley's ray tracing in various programming languages running on CPU & GPU and compared their performance.
+
+The performance was measured on the same scene (see image above) with the same amount of objects, the same recursive
+depth, the same resolution (1920 x 1080). The measured times are averaged over multiple runs.
+
+*Reference system: AMD Ryzen 9 5900X (12 Cores / 24 Threads) | AMD Radeon RX 6800 XT*
+
+|                                                                                                                | 1 sample / pixel | 100 samples / pixel |    10,000 samples / pixel | 
+|----------------------------------------------------------------------------------------------------------------|-----------------:|--------------------:|--------------------------:|
+| [CPU Ray Tracing (C++, with abstractions)](https://github.com/TwentyFiveSoftware/ray-tracing)                  |       3,800.0 ms |             380.0 s | ~ 10.5 h _(extrapolated)_ |
+| [CPU Ray Tracing (Rust)](https://github.com/TwentyFiveSoftware/rust-ray-tracing)                               |         770.0 ms |              77.0 s |  ~ 2.1 h _(extrapolated)_ |
+| [GPU Ray Tracing (Compute Shader)](https://github.com/TwentyFiveSoftware/ray-tracing-gpu)                      |          21.5 ms |               2.1 s |                   215.0 s |
+| [GPU Ray Tracing (Vulkan Ray Tracing extension)](https://github.com/TwentyFiveSoftware/ray-tracing-gpu-vulkan) |           1.2 ms |               0.1 s |                    12.5 s |
