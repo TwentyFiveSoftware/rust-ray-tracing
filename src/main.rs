@@ -154,7 +154,7 @@ fn ray_color(scene: &Scene, ray: &Ray, depth: u32) -> Vector3 {
         let scatter_info: ScatterInfo = hit_record.material.scatter(ray, &hit_record);
 
         if scatter_info.does_scatter {
-            return scatter_info.attenuation * ray_color(scene, &scatter_info.scattered_ray, depth - 1);
+            return &scatter_info.attenuation * ray_color(scene, &scatter_info.scattered_ray, depth - 1);
         }
 
         return Vector3::zero();

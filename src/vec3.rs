@@ -2,7 +2,7 @@ use std::fmt::{Display, Formatter};
 use std::ops::{Add, Div, Mul, Neg, Sub};
 use rand::Rng;
 
-#[derive(Copy, Clone)]
+#[derive(Clone)]
 pub struct Vector3 {
     pub x: f64,
     pub y: f64,
@@ -15,7 +15,7 @@ impl Display for Vector3 {
     }
 }
 
-impl Neg for Vector3 {
+impl Neg for &Vector3 {
     type Output = Vector3;
 
     fn neg(self) -> Self::Output {
@@ -27,6 +27,14 @@ impl Add for Vector3 {
     type Output = Vector3;
 
     fn add(self, other: Vector3) -> Self::Output {
+        &self + &other
+    }
+}
+
+impl Add for &Vector3 {
+    type Output = Vector3;
+
+    fn add(self, other: &Vector3) -> Self::Output {
         Vector3 { x: self.x + other.x, y: self.y + other.y, z: self.z + other.z }
     }
 }
@@ -35,6 +43,14 @@ impl Sub for Vector3 {
     type Output = Vector3;
 
     fn sub(self, other: Vector3) -> Self::Output {
+        &self - &other
+    }
+}
+
+impl Sub for &Vector3 {
+    type Output = Vector3;
+
+    fn sub(self, other: &Vector3) -> Self::Output {
         Vector3 { x: self.x - other.x, y: self.y - other.y, z: self.z - other.z }
     }
 }
@@ -43,11 +59,19 @@ impl Mul<f64> for Vector3 {
     type Output = Vector3;
 
     fn mul(self, scalar: f64) -> Self::Output {
+        &self * scalar
+    }
+}
+
+impl Mul<f64> for &Vector3 {
+    type Output = Vector3;
+
+    fn mul(self, scalar: f64) -> Self::Output {
         Vector3 { x: self.x * scalar, y: self.y * scalar, z: self.z * scalar }
     }
 }
 
-impl Mul<Vector3> for Vector3 {
+impl Mul<Vector3> for &Vector3 {
     type Output = Vector3;
 
     fn mul(self, other: Vector3) -> Self::Output {
@@ -59,16 +83,24 @@ impl Div<f64> for Vector3 {
     type Output = Vector3;
 
     fn div(self, scalar: f64) -> Self::Output {
+        &self / scalar
+    }
+}
+
+impl Div<f64> for &Vector3 {
+    type Output = Vector3;
+
+    fn div(self, scalar: f64) -> Self::Output {
         Vector3 { x: self.x / scalar, y: self.y / scalar, z: self.z / scalar }
     }
 }
 
 impl Vector3 {
-    pub fn dot(self, other: Vector3) -> f64 {
+    pub fn dot(&self, other: &Vector3) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
-    pub fn cross(self, other: Vector3) -> Vector3 {
+    pub fn cross(&self, other: &Vector3) -> Vector3 {
         Vector3 {
             x: self.y * other.z - self.z * other.y,
             y: self.z * other.x - self.x * other.z,
@@ -76,19 +108,19 @@ impl Vector3 {
         }
     }
 
-    pub fn length_squared(self) -> f64 {
+    pub fn length_squared(&self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
-    pub fn length(self) -> f64 {
+    pub fn length(&self) -> f64 {
         self.length_squared().sqrt()
     }
 
-    pub fn normalized(self) -> Vector3 {
+    pub fn normalized(&self) -> Vector3 {
         self / self.length()
     }
 
-    pub fn is_near_zero(self) -> bool {
+    pub fn is_near_zero(&self) -> bool {
         const EPSILON: f64 = 1e-8;
         self.x.abs() < EPSILON && self.y.abs() < EPSILON && self.z.abs() < EPSILON
     }

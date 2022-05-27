@@ -10,9 +10,9 @@ pub struct Sphere {
 
 impl Sphere {
     pub fn ray_hits_sphere(&self, ray: &Ray, t_min: f64, t_max: f64) -> HitRecord {
-        let oc: Vector3 = ray.origin - self.center;
+        let oc: Vector3 = &ray.origin - &self.center;
         let a: f64 = ray.direction.length_squared();
-        let half_b: f64 = oc.dot(ray.direction);
+        let half_b: f64 = oc.dot(&ray.direction);
         let c: f64 = oc.length_squared() - self.radius * self.radius;
         let discriminant: f64 = half_b * half_b - a * c;
 
@@ -31,16 +31,16 @@ impl Sphere {
         }
 
         let point: Vector3 = ray.at(t);
-        let normal: Vector3 = (point - self.center) / self.radius;
-        let is_front_face: bool = ray.direction.dot(normal) < 0.0;
+        let normal: Vector3 = (&point - &self.center) / self.radius;
+        let is_front_face: bool = ray.direction.dot(&normal) < 0.0;
 
         return HitRecord {
             hit: true,
             t,
             point,
-            normal: if is_front_face { normal } else { -normal },
+            normal: if is_front_face { normal } else { -&normal },
             is_front_face,
-            material: self.material,
+            material: self.material.clone(),
         };
     }
 }
