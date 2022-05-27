@@ -13,9 +13,9 @@ This project uses the [Rust](https://www.rust-lang.org/) programming language to
 1. Install [Rust](https://www.rust-lang.org/tools/install)
 2. Clone the repository
 3. Build the project
-    ```console
-    cargo build --release
-    ```
+   ```console
+   cargo build --release
+   ```
 4. Run the executable
    ```console
    ./target/release/rust-ray-tracing

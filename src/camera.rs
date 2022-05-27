@@ -24,7 +24,7 @@ impl Camera {
         let horizontal_direction: Vector3 = &right * viewport_width * focus_distance;
         let vertical_direction: Vector3 = &up * viewport_height * focus_distance;
 
-        let upper_left_corner: Vector3 = &look_from - &(&horizontal_direction * 0.5 + &vertical_direction * 0.5 + forward * focus_distance);
+        let upper_left_corner: Vector3 = &look_from + &(&horizontal_direction * -0.5 + &vertical_direction * 0.5 + forward * focus_distance);
 
         Camera {
             look_from,
