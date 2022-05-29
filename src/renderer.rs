@@ -1,17 +1,15 @@
 use image::Rgb;
-use rand::Rng;
 use crate::{Camera, HitRecord, IMAGE_HEIGHT, IMAGE_WIDTH, MAX_RAY_TRACE_DEPTH, Ray, ScatterInfo, Scene, Vector3};
 
 pub fn render_row(y: u32, samples_per_pixel: u32, camera: &Camera, scene: &Scene) -> [Rgb<u8>; IMAGE_WIDTH as usize] {
     let mut row: [Rgb<u8>; IMAGE_WIDTH as usize] = [Rgb([0, 0, 0]); IMAGE_WIDTH as usize];
-    let mut random = rand::thread_rng();
 
     for x in 0..IMAGE_WIDTH {
         let mut pixel_color: Vector3 = Vector3::zero();
 
         for _ in 0..samples_per_pixel {
-            let u: f64 = (x as f64 + random.gen::<f64>()) / (IMAGE_WIDTH as f64 - 1.0);
-            let v: f64 = (y as f64 + random.gen::<f64>()) / (IMAGE_HEIGHT as f64 - 1.0);
+            let u: f64 = (x as f64 + fastrand::f64()) / (IMAGE_WIDTH as f64 - 1.0);
+            let v: f64 = (y as f64 + fastrand::f64()) / (IMAGE_HEIGHT as f64 - 1.0);
 
             let ray: Ray = camera.get_ray(u, v);
             pixel_color = pixel_color + ray_color(&scene, &ray, MAX_RAY_TRACE_DEPTH);

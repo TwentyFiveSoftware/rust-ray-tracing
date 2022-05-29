@@ -1,4 +1,3 @@
-use rand::Rng;
 use crate::{Material, Sphere, Vector3};
 use crate::texture::Texture;
 
@@ -18,12 +17,12 @@ impl Scene {
                 Vector3 { x: 0.05, y: 0.05, z: 0.05 }, Vector3 { x: 0.95, y: 0.95, z: 0.95 })),
         });
 
-        let mut random = rand::thread_rng();
+        let random = fastrand::Rng::new();
 
         // SMALL SPHERES
         for x in -11..11 {
             for z in -11..11 {
-                let material_random: f64 = random.gen::<f64>();
+                let material_random: f64 = random.f64();
 
                 let material: Material =
                     if material_random < 0.8 {
@@ -36,9 +35,9 @@ impl Scene {
 
                 spheres.push(Sphere {
                     center: Vector3 {
-                        x: x as f64 + 0.9 * random.gen::<f64>(),
+                        x: x as f64 + 0.9 * random.f64(),
                         y: 0.2,
-                        z: z as f64 + 0.9 * random.gen::<f64>(),
+                        z: z as f64 + 0.9 * random.f64(),
                     },
                     radius: 0.2,
                     material,
@@ -70,7 +69,7 @@ impl Scene {
 }
 
 fn random_color() -> Vector3 {
-    let h: f64 = (rand::thread_rng().gen::<f64>() * 360.0).floor();
+    let h: f64 = (fastrand::f64() * 360.0).floor();
     hsv_to_rgb(h, 0.75, 0.45)
 }
 

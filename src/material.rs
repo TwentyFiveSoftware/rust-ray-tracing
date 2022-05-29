@@ -1,4 +1,3 @@
-use rand::Rng;
 use crate::{HitRecord, Ray, Vector3};
 use crate::scatter_info::ScatterInfo;
 use crate::texture::Texture;
@@ -77,7 +76,7 @@ impl Material {
         let r0: f64 = (1.0 - refraction_ratio) / (1.0 + refraction_ratio);
         let reflectance: f64 = r0 * r0 + (1.0 - r0 * r0) * (1.0 - cos_theta).powi(5);
 
-        if refraction_ratio * sin_theta > 1.0 || reflectance > rand::thread_rng().gen::<f64>() {
+        if refraction_ratio * sin_theta > 1.0 || reflectance > fastrand::f64() {
             return Material::reflect(vector, normal);
         }
 
