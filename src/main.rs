@@ -8,6 +8,7 @@ mod material;
 mod scatter_info;
 mod texture;
 mod renderer;
+mod color_util;
 
 use std::sync::{Arc, mpsc, Mutex};
 use std::{thread};

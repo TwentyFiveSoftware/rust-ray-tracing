@@ -27,7 +27,7 @@ fn ray_color(scene: &Scene, ray: &Ray, depth: u32) -> Vector3 {
         return Vector3::zero();
     }
 
-    let hit_record: HitRecord = ray_hit_scene(scene, &ray, 0.001, f64::INFINITY);
+    let hit_record: HitRecord = scene.ray_hit_scene(&ray, 0.001, f64::INFINITY);
     if hit_record.hit {
         let scatter_info: ScatterInfo = hit_record.material.scatter(ray, &hit_record);
 
@@ -42,20 +42,6 @@ fn ray_color(scene: &Scene, ray: &Ray, depth: u32) -> Vector3 {
     let t: f64 = 0.5 * (unit_direction.y + 1.0);
     let color: Vector3 = Vector3 { x: 1.0, y: 1.0, z: 1.0 } * (1.0 - t) + Vector3 { x: 0.5, y: 0.7, z: 1.0 } * t;
     color
-}
-
-fn ray_hit_scene(scene: &Scene, ray: &Ray, t_min: f64, t_max: f64) -> HitRecord {
-    let mut current_record: HitRecord = HitRecord::no_hit();
-    current_record.t = t_max;
-
-    for sphere in &scene.spheres[..] {
-        let record: HitRecord = sphere.ray_hits_sphere(ray, t_min, current_record.t);
-        if record.hit {
-            current_record = record;
-        }
-    }
-
-    current_record
 }
 
 fn color_to_rgb(mut color: Vector3) -> Rgb<u8> {
