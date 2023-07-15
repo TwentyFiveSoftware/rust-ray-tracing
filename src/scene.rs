@@ -18,7 +18,7 @@ impl Scene {
                 Vector3 { x: 0.05, y: 0.05, z: 0.05 }, Vector3 { x: 0.95, y: 0.95, z: 0.95 })),
         });
 
-        let random = fastrand::Rng::new();
+        let mut random = fastrand::Rng::new();
 
         // SMALL SPHERES
         for x in -11..11 {

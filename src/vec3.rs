@@ -133,7 +133,7 @@ impl Vector3 {
     }
 
     pub fn random_unit_vector() -> Vector3 {
-        let random = fastrand::Rng::new();
+        let mut random = fastrand::Rng::new();
 
         loop {
             let vector: Vector3 = Vector3 {

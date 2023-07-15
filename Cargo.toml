@@ -7,7 +7,7 @@ repository = "https://github.com/TwentyFiveSoftware/rust-ray-tracing"
 
 [dependencies]
 image = "0.24.5"
-fastrand = "1.8.0"
+fastrand = "2.0.0"
 num_cpus = "1.15.0"
 clap = { version = "4.1.4", features = ["derive"] }
 proc-macro2 = "1.0.51"
