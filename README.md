@@ -40,6 +40,7 @@ depth, the same resolution (1920 x 1080). The measured times are averaged over m
 | [Elixir](https://github.com/TwentyFiveSoftware/elixir-ray-tracing)                                 |        67,200 ms |                 N/A |
 | [JavaScript - Node.js](https://github.com/TwentyFiveSoftware/javascript-ray-tracing)               |         4,870 ms |               308 s |
 | [Go](https://github.com/TwentyFiveSoftware/go-ray-tracing)                                         |         1,410 ms |               142 s |
+| [OCaml](https://github.com/TwentyFiveSoftware/ocaml-ray-tracing)                                   |           795 ms |                75 s |
 | [Java](https://github.com/TwentyFiveSoftware/java-ray-tracing)                                     |           770 ms |                59 s |
 | [C++](https://github.com/TwentyFiveSoftware/ray-tracing)                                           |           685 ms |                70 s |
 | [Rust](https://github.com/TwentyFiveSoftware/rust-ray-tracing)                                     |           362 ms |                36 s |
